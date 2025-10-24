@@ -42,7 +42,7 @@ $sum_parts = [];
 foreach ($months as $m) {
     $alias = $all_month[$m - 1]; // convert to JAN, FEB, etc.
     $sum_parts[] =
-        "SUM(CASE WHEN FIELD(p.PaymentMonth, 'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC') = $m
+        "SUM(CASE WHEN FIELD(p.PaymentMonth, 'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC') = $m AND YEAR(p.ReceiptDate) = $start_year
              THEN p.PaymentAmount ELSE 0 END) AS `$alias`";
 }
 
