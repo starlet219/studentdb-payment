@@ -1,0 +1,48 @@
+
+body {
+  background: #f4f6f9;
+}
+
+.form-section {
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.student-box {
+  max-height: 100px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.class-header {
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.class-student {
+  display: flex;
+  margin-bottom: 10px;
+  border: 0.1px solid #8080803b;
+  border-radius: 7px;
+  /* padding-bottom: 10px 0 12px 0; */
+}
+
+.class-student > .form-section {
+  flex: 1;
+  margin: 0 20px;
+}
+
+.select-all-class {
+  font-size: 0.9em;
+  color: #007bff;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+#classSearch {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
