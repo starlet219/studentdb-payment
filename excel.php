@@ -28,9 +28,14 @@ if ($start_month > $end_month) {
 }
 
 // Start date (always day 01)
-$start_date = sprintf("%04d-%02d-01", $start_year, $start_month);
-$end_day = cal_days_in_month(CAL_GREGORIAN, $end_month, $start_year);
-$end_date = sprintf("%04d-%02d-%02d", $start_year, $end_month, $end_day);
+// $start_date = sprintf("%04d-%02d-01", $start_year, $start_month);
+// $end_day = cal_days_in_month(CAL_GREGORIAN, $end_month, $start_year);
+// $end_date = sprintf("%04d-%02d-%02d", $start_year, $end_month, $end_day);
+
+// // ReceiptDate is stored as "YYYY-MM"
+// $start_date = sprintf("%04d-%02d", $start_year, $start_month);
+// $end_date   = sprintf("%04d-%02d", $start_year, $end_month);
+
 $all_month = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 $months = range($start_month, $end_month);
 
@@ -40,8 +45,8 @@ $sum_parts = [];
 foreach ($months as $m) {
     $alias = $all_month[$m - 1]; // convert to JAN, FEB, etc.
     $sum_parts[] =
-        "SUM(CASE WHEN MONTH(p.ReceiptDate) = $m AND YEAR(p.ReceiptDate) = $start_year 
-                  THEN p.PaymentAmount ELSE 0 END) AS `$alias`";
+        "SUM(CASE WHEN FIELD(p.PaymentMonth, 'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC') = $m AND YEAR(p.ReceiptDate) = $start_year
+             THEN p.PaymentAmount ELSE 0 END) AS `$alias`";
 }
 
 $sum_sql = implode(",\n    ", $sum_parts);
@@ -57,7 +62,9 @@ SELECT
 FROM tblpayment p
 LEFT JOIN tblclass c 
        ON p.ClassName1 = c.ClassName
-WHERE p.ReceiptDate BETWEEN ? AND ?
+WHERE FIELD(p.PaymentMonth, 'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC')
+      BETWEEN ? AND ?
+
   AND p.StudentID1 IN ($placeholders)";
 
 // Add class filter only if not empty
@@ -72,8 +79,9 @@ ORDER BY p.ClassName1, p.StudentID1";
 $stmt = $conn->prepare($sql);
 
 // --- Bind Parameters ---
-$params = array_merge([$fee_default, $start_date, $end_date], $student_ids, $class_ids);
-$types = "iss" . str_repeat("s", count($student_ids)) . str_repeat("s", count($class_ids));
+$params = array_merge([$fee_default, $start_month, $end_month], $student_ids, $class_ids);
+// $types = "iss" . str_repeat("s", count($student_ids)) . str_repeat("s", count($class_ids));
+$types = "iii" . str_repeat("s", count($student_ids)) . str_repeat("s", count($class_ids));
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
